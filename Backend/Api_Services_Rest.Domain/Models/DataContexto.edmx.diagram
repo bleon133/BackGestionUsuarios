@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="39e5f4aa3250482a97d7cc7fa29c6912" Name="Diagram1">
+        <EntityTypeShape EntityType="productosDbModel.roles" Width="1.5" PointX="0.75" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="productosDbModel.usuarios" Width="1.5" PointX="0.75" PointY="3.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="productosDbModel.usuariosRoles" Width="1.5" PointX="3" PointY="0.875" IsExpanded="true" />
+        <AssociationConnector Association="productosDbModel.FK_usuariosRoles_roles" ManuallyRouted="false" />
+        <AssociationConnector Association="productosDbModel.FK_usuariosRoles_usuarios" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="productosDbModel.direcciones" Width="1.5" PointX="5.25" PointY="7.125" />
+        <EntityTypeShape EntityType="productosDbModel.perfilUsuario" Width="1.5" PointX="3" PointY="5.5" />
+        <EntityTypeShape EntityType="productosDbModel.Telefonos" Width="1.5" PointX="5.25" PointY="4.25" />
+        <AssociationConnector Association="productosDbModel.FK_direcciones_perfilUsuario" />
+        <AssociationConnector Association="productosDbModel.FK_perfilUsuario_usuarios" />
+        <AssociationConnector Association="productosDbModel.FK_Telefonos_perfilUsuario" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

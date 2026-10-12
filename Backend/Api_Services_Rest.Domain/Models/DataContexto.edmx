@@ -1,0 +1,410 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="productosDbModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="direcciones">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="calle" Type="varchar" MaxLength="100" />
+          <Property Name="colonia" Type="varchar" MaxLength="150" />
+          <Property Name="NumInterior" Type="varchar" MaxLength="30" />
+          <Property Name="NumExterior" Type="varchar" MaxLength="30" />
+          <Property Name="Municipio" Type="varchar" MaxLength="150" />
+          <Property Name="idPerfilUsuario" Type="int" />
+        </EntityType>
+        <EntityType Name="perfilUsuario">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nombre" Type="varchar" MaxLength="100" />
+          <Property Name="apellidoPaterno" Type="varchar" MaxLength="100" />
+          <Property Name="apellidoMaterno" Type="varchar" MaxLength="100" />
+          <Property Name="fechaNacimiento" Type="date" />
+          <Property Name="rfc" Type="varchar" MaxLength="30" />
+          <Property Name="idUsuario" Type="int" />
+        </EntityType>
+        <EntityType Name="roles">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="valor" Type="varchar" MaxLength="50" />
+          <Property Name="descripcion" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="Telefonos">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="celular" Type="varchar" MaxLength="10" />
+          <Property Name="casa" Type="varchar" MaxLength="10" />
+          <Property Name="oficina" Type="varchar" MaxLength="10" />
+          <Property Name="idPerfilUsuario" Type="int" />
+        </EntityType>
+        <EntityType Name="usuarios">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="username" Type="varchar" MaxLength="100" />
+          <Property Name="password" Type="varchar" MaxLength="100" />
+          <Property Name="suspendido" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="usuariosRoles">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="idUsuario" Type="int" />
+          <Property Name="idRol" Type="int" />
+        </EntityType>
+        <Association Name="FK_direcciones_perfilUsuario">
+          <End Role="perfilUsuario" Type="Self.perfilUsuario" Multiplicity="0..1" />
+          <End Role="direcciones" Type="Self.direcciones" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="perfilUsuario">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="direcciones">
+              <PropertyRef Name="idPerfilUsuario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_perfilUsuario_usuarios">
+          <End Role="usuarios" Type="Self.usuarios" Multiplicity="0..1" />
+          <End Role="perfilUsuario" Type="Self.perfilUsuario" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="usuarios">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="perfilUsuario">
+              <PropertyRef Name="idUsuario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Telefonos_perfilUsuario">
+          <End Role="perfilUsuario" Type="Self.perfilUsuario" Multiplicity="0..1" />
+          <End Role="Telefonos" Type="Self.Telefonos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="perfilUsuario">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Telefonos">
+              <PropertyRef Name="idPerfilUsuario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_usuariosRoles_roles">
+          <End Role="roles" Type="Self.roles" Multiplicity="0..1" />
+          <End Role="usuariosRoles" Type="Self.usuariosRoles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="roles">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="usuariosRoles">
+              <PropertyRef Name="idRol" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_usuariosRoles_usuarios">
+          <End Role="usuarios" Type="Self.usuarios" Multiplicity="0..1" />
+          <End Role="usuariosRoles" Type="Self.usuariosRoles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="usuarios">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="usuariosRoles">
+              <PropertyRef Name="idUsuario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="productosDbModelStoreContainer">
+          <EntitySet Name="direcciones" EntityType="Self.direcciones" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="perfilUsuario" EntityType="Self.perfilUsuario" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="roles" EntityType="Self.roles" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Telefonos" EntityType="Self.Telefonos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="usuarios" EntityType="Self.usuarios" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="usuariosRoles" EntityType="Self.usuariosRoles" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_direcciones_perfilUsuario" Association="Self.FK_direcciones_perfilUsuario">
+            <End Role="perfilUsuario" EntitySet="perfilUsuario" />
+            <End Role="direcciones" EntitySet="direcciones" />
+          </AssociationSet>
+          <AssociationSet Name="FK_perfilUsuario_usuarios" Association="Self.FK_perfilUsuario_usuarios">
+            <End Role="usuarios" EntitySet="usuarios" />
+            <End Role="perfilUsuario" EntitySet="perfilUsuario" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Telefonos_perfilUsuario" Association="Self.FK_Telefonos_perfilUsuario">
+            <End Role="perfilUsuario" EntitySet="perfilUsuario" />
+            <End Role="Telefonos" EntitySet="Telefonos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_usuariosRoles_roles" Association="Self.FK_usuariosRoles_roles">
+            <End Role="roles" EntitySet="roles" />
+            <End Role="usuariosRoles" EntitySet="usuariosRoles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_usuariosRoles_usuarios" Association="Self.FK_usuariosRoles_usuarios">
+            <End Role="usuarios" EntitySet="usuarios" />
+            <End Role="usuariosRoles" EntitySet="usuariosRoles" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="productosDbModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="roles">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="valor" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="descripcion" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="usuariosRoles" Relationship="Self.FK_usuariosRoles_roles" FromRole="roles" ToRole="usuariosRoles" />
+        </EntityType>
+        <EntityType Name="usuarios">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="username" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="password" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="suspendido" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="usuariosRoles" Relationship="Self.FK_usuariosRoles_usuarios" FromRole="usuarios" ToRole="usuariosRoles" />
+          <NavigationProperty Name="perfilUsuario" Relationship="productosDbModel.FK_perfilUsuario_usuarios" FromRole="usuarios" ToRole="perfilUsuario" />
+        </EntityType>
+        <EntityType Name="usuariosRoles">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="idUsuario" Type="Int32" />
+          <Property Name="idRol" Type="Int32" />
+          <NavigationProperty Name="roles" Relationship="Self.FK_usuariosRoles_roles" FromRole="usuariosRoles" ToRole="roles" />
+          <NavigationProperty Name="usuarios" Relationship="Self.FK_usuariosRoles_usuarios" FromRole="usuariosRoles" ToRole="usuarios" />
+        </EntityType>
+        <Association Name="FK_usuariosRoles_roles">
+          <End Role="roles" Type="Self.roles" Multiplicity="0..1" />
+          <End Role="usuariosRoles" Type="Self.usuariosRoles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="roles">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="usuariosRoles">
+              <PropertyRef Name="idRol" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_usuariosRoles_usuarios">
+          <End Role="usuarios" Type="Self.usuarios" Multiplicity="0..1" />
+          <End Role="usuariosRoles" Type="Self.usuariosRoles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="usuarios">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="usuariosRoles">
+              <PropertyRef Name="idUsuario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="productosDbEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="roles" EntityType="Self.roles" />
+          <EntitySet Name="usuarios" EntityType="Self.usuarios" />
+          <EntitySet Name="usuariosRoles" EntityType="Self.usuariosRoles" />
+          <AssociationSet Name="FK_usuariosRoles_roles" Association="Self.FK_usuariosRoles_roles">
+            <End Role="roles" EntitySet="roles" />
+            <End Role="usuariosRoles" EntitySet="usuariosRoles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_usuariosRoles_usuarios" Association="Self.FK_usuariosRoles_usuarios">
+            <End Role="usuarios" EntitySet="usuarios" />
+            <End Role="usuariosRoles" EntitySet="usuariosRoles" />
+          </AssociationSet>
+          <EntitySet Name="direcciones" EntityType="productosDbModel.direcciones" />
+          <EntitySet Name="perfilUsuario" EntityType="productosDbModel.perfilUsuario" />
+          <EntitySet Name="Telefonos" EntityType="productosDbModel.Telefonos" />
+          <AssociationSet Name="FK_direcciones_perfilUsuario" Association="productosDbModel.FK_direcciones_perfilUsuario">
+            <End Role="perfilUsuario" EntitySet="perfilUsuario" />
+            <End Role="direcciones" EntitySet="direcciones" />
+          </AssociationSet>
+          <AssociationSet Name="FK_perfilUsuario_usuarios" Association="productosDbModel.FK_perfilUsuario_usuarios">
+            <End Role="usuarios" EntitySet="usuarios" />
+            <End Role="perfilUsuario" EntitySet="perfilUsuario" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Telefonos_perfilUsuario" Association="productosDbModel.FK_Telefonos_perfilUsuario">
+            <End Role="perfilUsuario" EntitySet="perfilUsuario" />
+            <End Role="Telefonos" EntitySet="Telefonos" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="direcciones">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="calle" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="colonia" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="NumInterior" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="NumExterior" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="Municipio" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="idPerfilUsuario" Type="Int32" />
+          <NavigationProperty Name="perfilUsuario" Relationship="productosDbModel.FK_direcciones_perfilUsuario" FromRole="direcciones" ToRole="perfilUsuario" />
+        </EntityType>
+        <EntityType Name="perfilUsuario">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nombre" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="apellidoPaterno" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="apellidoMaterno" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="fechaNacimiento" Type="DateTime" Precision="0" />
+          <Property Name="rfc" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="idUsuario" Type="Int32" />
+          <NavigationProperty Name="direcciones" Relationship="productosDbModel.FK_direcciones_perfilUsuario" FromRole="perfilUsuario" ToRole="direcciones" />
+          <NavigationProperty Name="usuarios" Relationship="productosDbModel.FK_perfilUsuario_usuarios" FromRole="perfilUsuario" ToRole="usuarios" />
+          <NavigationProperty Name="Telefonos" Relationship="productosDbModel.FK_Telefonos_perfilUsuario" FromRole="perfilUsuario" ToRole="Telefonos" />
+        </EntityType>
+        <EntityType Name="Telefonos">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="celular" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="casa" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="oficina" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="idPerfilUsuario" Type="Int32" />
+          <NavigationProperty Name="perfilUsuario" Relationship="productosDbModel.FK_Telefonos_perfilUsuario" FromRole="Telefonos" ToRole="perfilUsuario" />
+        </EntityType>
+        <Association Name="FK_direcciones_perfilUsuario">
+          <End Type="productosDbModel.perfilUsuario" Role="perfilUsuario" Multiplicity="0..1" />
+          <End Type="productosDbModel.direcciones" Role="direcciones" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="perfilUsuario">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="direcciones">
+              <PropertyRef Name="idPerfilUsuario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_perfilUsuario_usuarios">
+          <End Type="productosDbModel.usuarios" Role="usuarios" Multiplicity="0..1" />
+          <End Type="productosDbModel.perfilUsuario" Role="perfilUsuario" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="usuarios">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="perfilUsuario">
+              <PropertyRef Name="idUsuario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Telefonos_perfilUsuario">
+          <End Type="productosDbModel.perfilUsuario" Role="perfilUsuario" Multiplicity="0..1" />
+          <End Type="productosDbModel.Telefonos" Role="Telefonos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="perfilUsuario">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Telefonos">
+              <PropertyRef Name="idPerfilUsuario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="productosDbModelStoreContainer" CdmEntityContainer="productosDbEntities">
+          <EntitySetMapping Name="roles">
+            <EntityTypeMapping TypeName="productosDbModel.roles">
+              <MappingFragment StoreEntitySet="roles">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="valor" ColumnName="valor" />
+                <ScalarProperty Name="descripcion" ColumnName="descripcion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="usuarios">
+            <EntityTypeMapping TypeName="productosDbModel.usuarios">
+              <MappingFragment StoreEntitySet="usuarios">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="username" ColumnName="username" />
+                <ScalarProperty Name="password" ColumnName="password" />
+                <ScalarProperty Name="suspendido" ColumnName="suspendido" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="usuariosRoles">
+            <EntityTypeMapping TypeName="productosDbModel.usuariosRoles">
+              <MappingFragment StoreEntitySet="usuariosRoles">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="idUsuario" ColumnName="idUsuario" />
+                <ScalarProperty Name="idRol" ColumnName="idRol" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="direcciones">
+            <EntityTypeMapping TypeName="productosDbModel.direcciones">
+              <MappingFragment StoreEntitySet="direcciones">
+                <ScalarProperty Name="idPerfilUsuario" ColumnName="idPerfilUsuario" />
+                <ScalarProperty Name="Municipio" ColumnName="Municipio" />
+                <ScalarProperty Name="NumExterior" ColumnName="NumExterior" />
+                <ScalarProperty Name="NumInterior" ColumnName="NumInterior" />
+                <ScalarProperty Name="colonia" ColumnName="colonia" />
+                <ScalarProperty Name="calle" ColumnName="calle" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="perfilUsuario">
+            <EntityTypeMapping TypeName="productosDbModel.perfilUsuario">
+              <MappingFragment StoreEntitySet="perfilUsuario">
+                <ScalarProperty Name="idUsuario" ColumnName="idUsuario" />
+                <ScalarProperty Name="rfc" ColumnName="rfc" />
+                <ScalarProperty Name="fechaNacimiento" ColumnName="fechaNacimiento" />
+                <ScalarProperty Name="apellidoMaterno" ColumnName="apellidoMaterno" />
+                <ScalarProperty Name="apellidoPaterno" ColumnName="apellidoPaterno" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Telefonos">
+            <EntityTypeMapping TypeName="productosDbModel.Telefonos">
+              <MappingFragment StoreEntitySet="Telefonos">
+                <ScalarProperty Name="idPerfilUsuario" ColumnName="idPerfilUsuario" />
+                <ScalarProperty Name="oficina" ColumnName="oficina" />
+                <ScalarProperty Name="casa" ColumnName="casa" />
+                <ScalarProperty Name="celular" ColumnName="celular" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
