@@ -165,6 +165,8 @@
   <ItemGroup>
     <Content Include="Global.asax" />
     <Content Include="Web.config" />
+    <Content Include="connectionStrings.config" />
+    <Content Include="connectionStrings.Release.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\SwaggerConfig.cs" />

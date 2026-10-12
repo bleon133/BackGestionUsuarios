@@ -418,4 +418,4 @@ FodyWeavers.xsd
 *.msp
 
 # Secretos locales (connection strings)
-**/connectionStrings.config
+**/connectionStrings*.config

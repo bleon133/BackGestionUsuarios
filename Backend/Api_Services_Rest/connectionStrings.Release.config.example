@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copia este archivo como connectionStrings.Release.config con los datos del servidor de produccion. No se versiona. -->
+<connectionStrings>
+  <add name="productosDbEntities" connectionString="metadata=res://*/Models.DataContexto.csdl|res://*/Models.DataContexto.ssdl|res://*/Models.DataContexto.msl;provider=System.Data.SqlClient;provider connection string=&quot;data source=YOUR_HOST;initial catalog=productosDb;persist security info=False;user id=YOUR_USER;password=YOUR_PASSWORD;TrustServerCertificate=True;MultipleActiveResultSets=True;App=EntityFramework&quot;" providerName="System.Data.EntityClient" />
+</connectionStrings>

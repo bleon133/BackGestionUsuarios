@@ -309,6 +309,7 @@ Prefijo común: `/api/v1`
 ## Configuración y seguridad
 
 - La cadena de conexión vive en `connectionStrings.config`, que **no** se versiona. Usa siempre `connectionStrings.config.example` como plantilla.
+- Para publicar, copia `connectionStrings.Release.config.example` como `connectionStrings.Release.config` y completa los datos del servidor. La configuración **Release** usa ese archivo automáticamente (transform en `Web.Release.config`), mientras que **Debug** sigue usando `connectionStrings.config`.
 - Se recomienda un login de SQL Server con permisos mínimos sobre `productosDb` en lugar de `sa`.
 - Los datos de ejemplo del script SQL son solo para desarrollo.
 
