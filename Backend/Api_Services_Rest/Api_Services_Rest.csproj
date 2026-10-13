@@ -184,6 +184,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Mapper\AutoMapperConfig.cs" />
+    <Compile Include="Models\Dto\LoginDto.cs" />
+    <Compile Include="Services\Seguridad\PasswordHasher.cs" />
     <Compile Include="Mapper\MappingProfile.cs" />
     <Compile Include="Models\Dto\DeleteRolResult.cs" />
     <Compile Include="Models\Dto\DireccionDto.cs" />

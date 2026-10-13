@@ -239,6 +239,9 @@ Prefijo común: `/api/v1`
 | PUT | `/{id}` | Actualiza un usuario |
 | DELETE | `/{id}` | Elimina un usuario y sus datos relacionados |
 | PATCH | `/{id}/toggle-suspendido` | Suspende o reactiva un usuario |
+| POST | `/login` | Valida usuario y contraseña (401 credenciales incorrectas, 403 cuenta suspendida) |
+
+Las contraseñas se almacenan con hash PBKDF2 y nunca se devuelven en las respuestas. En `PUT`, si no se envía `Password` se conserva la actual.
 
 ### Roles · `/api/v1/roles`
 
@@ -320,7 +323,6 @@ Prefijo común: `/api/v1`
 ## Roadmap
 
 - [ ] Autenticación y autorización (JWT) con roles.
-- [ ] Almacenar contraseñas con hash y no devolverlas en las respuestas.
 - [ ] Validación de modelos y DTOs separados para creación y respuesta.
 - [ ] Acciones asíncronas e inyección de dependencias.
 - [ ] Restringir CORS a orígenes conocidos.

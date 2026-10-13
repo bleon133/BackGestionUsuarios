@@ -101,7 +101,7 @@ namespace Api_Services_Rest.Mapper
             CreateMap<usuarios, UsuariosDto>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.id))
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.username))
-                .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.password))
+                .ForMember(dest => dest.Password, opt => opt.Ignore())
                 .ForMember(dest => dest.Suspendido, opt => opt.MapFrom(src => src.suspendido))
                 .ForMember(dest => dest.UsuariosRolesDtos, opt => opt.MapFrom(src => src.usuariosRoles))
                 .ForMember(dest => dest.PerfilUsuarioDtos, opt => opt.MapFrom(src => src.perfilUsuario));

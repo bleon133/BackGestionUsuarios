@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Api_Services_Rest.Services.Seguridad;
 
 namespace Api_Services_Rest.Services.Usuario
 {
@@ -70,6 +71,43 @@ namespace Api_Services_Rest.Services.Usuario
             }
         }
 
+        /// <summary>
+        /// Valida las credenciales. Devuelve null si son incorrectas. Si son correctas
+        /// devuelve el usuario y suspendido indica si la cuenta está bloqueada.
+        /// Las contraseñas antiguas en texto plano se convierten a hash al entrar.
+        /// </summary>
+        public Api_Services_Rest.Domain.Models.usuarios Autenticar(string username, string password, out bool suspendido)
+        {
+            suspendido = false;
+            try
+            {
+                var usuario = dbEntities.usuarios
+                    .Include("usuariosRoles")
+                    .Include("usuariosRoles.roles")
+                    .FirstOrDefault(u => u.username == username);
+
+                if (usuario == null)
+                    return null;
+
+                bool needsRehash;
+                if (!PasswordHasher.Verify(password, usuario.password, out needsRehash))
+                    return null;
+
+                if (needsRehash)
+                {
+                    usuario.password = PasswordHasher.Hash(password);
+                    dbEntities.SaveChanges();
+                }
+
+                suspendido = usuario.suspendido;
+                return usuario;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public bool CreateUsuario(Api_Services_Rest.Domain.Models.usuarios usuario)
         {
             bool result = false;
@@ -81,6 +119,7 @@ namespace Api_Services_Rest.Services.Usuario
                 if (exists)
                     return result;
 
+                usuario.password = PasswordHasher.Hash(usuario.password);
                 dbEntities.usuarios.Add(usuario);
                 dbEntities.SaveChanges();
                 transaction.Commit();
@@ -109,7 +148,9 @@ namespace Api_Services_Rest.Services.Usuario
                     return result;
 
                 usuarioDb.username = usuario.username;
-                usuarioDb.password = usuario.password;
+                // Si no se envía contraseña se conserva la actual
+                if (!string.IsNullOrEmpty(usuario.password))
+                    usuarioDb.password = PasswordHasher.Hash(usuario.password);
                 usuarioDb.suspendido = usuario.suspendido;
 
                 dbEntities.SaveChanges();

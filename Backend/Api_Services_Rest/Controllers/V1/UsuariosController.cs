@@ -79,6 +79,9 @@ namespace Api_Services_Rest.Controllers.V1
             try
             {
                 var model = AutoMapperConfig.Mapper.Map<Api_Services_Rest.Domain.Models.usuarios>(dto);
+                if (string.IsNullOrWhiteSpace(dto.Password))
+                    return BadRequest("La contraseña es obligatoria.");
+
                 var result = _usuariosServices.CreateUsuario(model);
                 if (!result)
                     return Conflict(); // username ya existe
@@ -89,6 +92,26 @@ namespace Api_Services_Rest.Controllers.V1
             {
                 return InternalServerError();
             }
+        }
+
+        // POST api/v1/Usuarios/login
+        [HttpPost]
+        [Route("login")]
+        public IHttpActionResult Login([FromBody] LoginDto login)
+        {
+            if (login == null || string.IsNullOrWhiteSpace(login.Username) || string.IsNullOrEmpty(login.Password))
+                return BadRequest("Usuario y contraseña son obligatorios.");
+
+            bool suspendido;
+            var usuario = _usuariosServices.Autenticar(login.Username, login.Password, out suspendido);
+
+            if (usuario == null)
+                return Content(HttpStatusCode.Unauthorized, new { message = "Usuario o contraseña incorrectos." });
+
+            if (suspendido)
+                return Content(HttpStatusCode.Forbidden, new { message = "La cuenta está suspendida." });
+
+            return Ok(AutoMapperConfig.Mapper.Map<UsuariosDto>(usuario));
         }
 
         // PUT api/v1/Usuarios/{id}
