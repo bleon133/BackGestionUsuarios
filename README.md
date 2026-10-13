@@ -326,6 +326,7 @@ Prefijo común: `/api/v1`
 - [ ] Restringir CORS a orígenes conocidos.
 - [ ] Restricciones `UNIQUE` e índices en la base de datos.
 - [ ] Pruebas unitarias y de integración.
+- [ ] Deuda técnica: AutoMapper 9.0.0 tiene el aviso de seguridad [GHSA-rvv3-g6hj-g44x](https://github.com/advisories/GHSA-rvv3-g6hj-g44x) (denegación de servicio por recursión en grafos cíclicos). La corrección está en 15.1.1 o superior, que requiere licencia; evaluar migrar o usar mapeo manual. Los DTOs actuales ignoran las propiedades de navegación, lo que reduce el riesgo.
 
 ---
 
