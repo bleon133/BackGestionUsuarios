@@ -21,6 +21,8 @@ API REST para la gestión de usuarios, roles, perfiles, direcciones y teléfonos
 - [Instalación y ejecución](#instalación-y-ejecución)
 - [Endpoints](#endpoints)
 - [Configuración y seguridad](#configuración-y-seguridad)
+- [Autenticación](#autenticación)
+- [Seguridad](#seguridad)
 - [Roadmap](#roadmap)
 - [Autor](#autor)
 
@@ -35,6 +37,8 @@ API REST para la gestión de usuarios, roles, perfiles, direcciones y teléfonos
 - Eliminación en cascada controlada desde la capa de servicios (usuario → perfil → direcciones y teléfonos).
 - API versionada bajo `/api/v1`.
 - Documentación interactiva con **Swagger**.
+- Autenticación con **JWT** (HS256) y autorización por roles.
+- Validación de DTOs con **DataAnnotations** y CORS configurable por orígenes.
 - Separación entre entidades de base de datos y **DTOs** mediante **AutoMapper**.
 - Operaciones de escritura dentro de transacciones.
 
@@ -163,6 +167,7 @@ BackGestionUsuarios/
     │   ├── Models/Dto/                 # DTOs expuestos por la API
     │   ├── Services/                   # Lógica de negocio y acceso a datos
     │   ├── Web.config
+    │   ├── appSettings.config.example
     │   └── connectionStrings.config.example
     └── Api_Services_Rest.Domain/       # Modelo EF6 (EDMX) y DbContext
 ```
@@ -239,7 +244,7 @@ Prefijo común: `/api/v1`
 | PUT | `/{id}` | Actualiza un usuario |
 | DELETE | `/{id}` | Elimina un usuario y sus datos relacionados |
 | PATCH | `/{id}/toggle-suspendido` | Suspende o reactiva un usuario |
-| POST | `/login` | Valida usuario y contraseña (401 credenciales incorrectas, 403 cuenta suspendida) |
+| POST | `/login` | Inicia sesión y devuelve el token JWT (401 credenciales, 403 suspendido, 429 demasiados intentos) |
 
 Las contraseñas se almacenan con hash PBKDF2 y nunca se devuelven en las respuestas. En `PUT`, si no se envía `Password` se conserva la actual.
 
@@ -303,8 +308,11 @@ Las contraseñas se almacenan con hash PBKDF2 y nunca se devuelven en las respue
 |---|---|
 | `200 OK` | Operación exitosa |
 | `400 Bad Request` | Id inválido o cuerpo de la petición vacío |
+| `401 Unauthorized` | Falta el token o no es válido |
+| `403 Forbidden` | Autenticado pero sin el rol necesario, o cuenta suspendida |
 | `404 Not Found` | El recurso no existe |
 | `409 Conflict` | Duplicado (`username` o rol ya asignado) o rol en uso |
+| `429 Too Many Requests` | Demasiados intentos de login (bloqueo temporal) |
 | `500 Internal Server Error` | Error inesperado del servidor |
 
 ---
@@ -316,16 +324,98 @@ Las contraseñas se almacenan con hash PBKDF2 y nunca se devuelven en las respue
 - Se recomienda un login de SQL Server con permisos mínimos sobre `productosDb` en lugar de `sa`.
 - Los datos de ejemplo del script SQL son solo para desarrollo.
 
-> **Nota:** este proyecto aún no incluye autenticación ni autorización. No lo expongas en un entorno público sin completar los puntos del [roadmap](#roadmap).
+> **Nota:** antes de exponer la API configura `Jwt:Secret` (mínimo 32 caracteres) y `Cors:Origins`. Revisa las secciones [Autenticación](#autenticación) y [Seguridad](#seguridad).
+
+---
+
+## Autenticación
+
+La API usa **JWT firmado con HS256** a mano (con `HMACSHA256` de la BCL), sin paquetes externos. El flujo es:
+
+1. El cliente hace `POST /api/v1/Usuarios/login` con `{ "username": "...", "password": "..." }`.
+2. Si las credenciales son correctas, la respuesta es `200 OK`:
+
+   ```json
+   {
+     "token": "<jwt>",
+     "expiresAt": "2026-04-14T12:34:56.7890123Z",
+     "usuario": { "Id": 1, "Username": "admin.lopez", "Suspendido": false }
+   }
+   ```
+
+   El objeto `usuario` es el `UsuariosDto` de siempre pero **sin** el campo `Password`.
+
+3. En cada petición protegida el cliente envía la cabecera `Authorization: Bearer <token>`. Un
+   `DelegatingHandler` (`JwtAuthenticationHandler`) valida la firma y la expiración y deja un
+   `ClaimsPrincipal` con el id del usuario (`NameIdentifier`), su `Name` y una claim de rol por
+   cada rol asignado.
+4. Si el token falta, está caducado o la firma no coincide, los endpoints marcados con
+   `[Authorize]` responden `401`.
+
+### Roles
+
+Todos los endpoints piden autenticación (`[Authorize]`); el único marcado con `[AllowAnonymous]`
+es el login. Las operaciones de administración piden el rol **`ADMIN`** (es el `valor` del rol
+administrador en la base de datos, no hay que confundirlo con su descripción "Administrador del
+sistema"):
+
+- crear, editar y eliminar roles,
+- asignar o quitar roles a un usuario (`UsuarioRoles`),
+- eliminar usuarios y suspender/reactivar sus cuentas.
+
+El resto de operaciones (consultas, perfiles, direcciones y teléfonos) quedan disponibles para
+cualquier usuario autenticado, de modo que cada quien pueda ver y editar su propio perfil.
+
+### Límite de intentos
+
+Para frenar la fuerza bruta, el login cuenta los fallos por **usuario + IP** en memoria (un
+`ConcurrentDictionary`). A los 5 fallos la cuenta se bloquea 5 minutos y se responde
+`429 Too Many Requests` con un mensaje genérico. La comprobación de credenciales devuelve
+siempre el mismo mensaje, exista o no el usuario, para no filtrar qué cuentas son válidas.
+Como el contador vive en memoria, se reinicia si la aplicación se recicla o si corre en varias
+instancias.
+
+---
+
+## Seguridad
+
+- **Contraseñas**: se guardan con PBKDF2 (SHA-256, 100.000 iteraciones) en formato
+  `v1$iteraciones$salt$hash` (`Services/Seguridad/PasswordHasher.cs`). Nunca viajan en las
+  respuestas. Las contraseñas antiguas en texto plano se convierten a hash la primera vez que el
+  usuario entra.
+- **Secreto JWT**: se lee de `Jwt:Secret` (appSettings). Si está vacío o tiene menos de 32
+  caracteres, el login responde `500` con un mensaje genérico; nunca se usa un secreto por
+  defecto. No se sube al repositorio: define el valor fuera de git, por ejemplo copiando
+  `appSettings.config.example` como `appSettings.config` y cambiando `<appSettings>` por
+  `<appSettings configSource="appSettings.config" />`, igual que se hace con `connectionStrings.config`.
+- **CORS**: los orígenes permitidos se leen de `Cors:Origins` (lista separada por comas), por
+  defecto `http://localhost:5173`. Se permiten los métodos `GET, POST, PUT, DELETE, OPTIONS,
+  PATCH` y las cabeceras `Authorization` y `Content-Type`.
+- **Errores**: los `catch` devuelven `InternalServerError()` genérico; nunca se expone
+  `ex.Message` ni la pila al cliente.
+- **Validación**: los DTOs usan DataAnnotations (`Required`, `StringLength`,
+  `RegularExpression`, `Range`) y cada `POST`/`PUT` comprueba `ModelState.IsValid` antes de
+  escribir en la base de datos, devolviendo `400 Bad Request` con los detalles.
+- **Swagger**: el documento incluye un esquema de seguridad `Bearer` sobre la cabecera
+  `Authorization`. Para probar los endpoints protegidos envía `Authorization: Bearer <token>`.
+
+### Limitaciones conocidas
+
+- El contador de intentos vive en memoria: no se comparte entre instancias ni sobrevive a un
+  reciclado de la aplicación.
+- No hay refresh tokens ni revocación: cuando el token caduca hay que volver a hacer login.
+- No hay recuperación de contraseña ni bloqueo persistente de cuentas.
+- La autorización es por rol global; más allá de que cada quien opera sobre su propio perfil, no
+  hay comprobaciones de propiedad por recurso.
 
 ---
 
 ## Roadmap
 
-- [ ] Autenticación y autorización (JWT) con roles.
+- [x] Autenticación y autorización (JWT) con roles.
 - [ ] Validación de modelos y DTOs separados para creación y respuesta.
 - [ ] Acciones asíncronas e inyección de dependencias.
-- [ ] Restringir CORS a orígenes conocidos.
+- [x] Restringir CORS a orígenes conocidos.
 - [ ] Restricciones `UNIQUE` e índices en la base de datos.
 - [ ] Pruebas unitarias y de integración.
 - [ ] Deuda técnica: AutoMapper 9.0.0 tiene el aviso de seguridad [GHSA-rvv3-g6hj-g44x](https://github.com/advisories/GHSA-rvv3-g6hj-g44x) (denegación de servicio por recursión en grafos cíclicos). La corrección está en 15.1.1 o superior, que requiere licencia; evaluar migrar o usar mapeo manual. Los DTOs actuales ignoran las propiedades de navegación, lo que reduce el riesgo.
