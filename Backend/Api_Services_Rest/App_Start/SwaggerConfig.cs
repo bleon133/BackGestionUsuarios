@@ -33,7 +33,13 @@ namespace Api_Services_Rest
                         // additional fields by chaining methods off SingleApiVersion.
                         //
                         c.SingleApiVersion("v1", "Api_Services_Rest");
-                        c.RootUrl(req => "https://apigestionusuarios.brayandeveloper.online");
+
+                        // Esquema de seguridad: JWT en la cabecera Authorization.
+                        // Para probar, envía la cabecera: Authorization: Bearer <token>
+                        c.ApiKey("Bearer")
+                            .Description("Autenticación JWT. Formato: Bearer <token>.")
+                            .Name("Authorization")
+                            .In("header");
 
                         // If you want the output Swagger docs to be indented properly, enable the "PrettyPrint" option.
                         //

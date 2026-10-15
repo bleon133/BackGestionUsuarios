@@ -10,6 +10,7 @@ using System.Web.Http;
 
 namespace Api_Services_Rest.Controllers.V1
 {
+    [Authorize]
     [RoutePrefix("api/v1/roles")]
     public class RolesController : ApiController
     {
@@ -91,18 +92,22 @@ namespace Api_Services_Rest.Controllers.V1
 
         // POST api/v1/Roles
         [HttpPost]
+        [Authorize(Roles = "ADMIN")]
         [Route("")]
         public IHttpActionResult Create([FromBody] RolesDto dto)
         {
             if (dto == null)
                 return BadRequest("El cuerpo de la solicitud no puede ser nulo.");
 
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 var model = AutoMapperConfig.Mapper.Map<Api_Services_Rest.Domain.Models.roles>(dto);
                 var result = _rolesService.CreateRol(model);
                 if (!result)
-                    return InternalServerError(new Exception("No se pudo crear el rol."));
+                    return InternalServerError();
 
                 return Ok(result);
             }
@@ -114,6 +119,7 @@ namespace Api_Services_Rest.Controllers.V1
 
         // PUT api/v1/Roles/{id}
         [HttpPut]
+        [Authorize(Roles = "ADMIN")]
         [Route("{id:int}")]
         public IHttpActionResult Update([FromUri] int id, [FromBody] RolesDto dto)
         {
@@ -122,6 +128,9 @@ namespace Api_Services_Rest.Controllers.V1
 
             if (dto == null)
                 return BadRequest("El cuerpo de la solicitud no puede ser nulo.");
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             try
             {
@@ -139,6 +148,7 @@ namespace Api_Services_Rest.Controllers.V1
         }
 
         [HttpDelete]
+        [Authorize(Roles = "ADMIN")]
         [Route("{id:int}")]
         public IHttpActionResult Delete([FromUri] int id)
         {
@@ -156,7 +166,7 @@ namespace Api_Services_Rest.Controllers.V1
                     return Content(HttpStatusCode.Conflict, new { message = result.Message });
 
                 if (!result.Success)
-                    return InternalServerError(new Exception(result.Message));
+                    return InternalServerError();
 
                 return Ok(new { message = "Rol eliminado correctamente." });
             }

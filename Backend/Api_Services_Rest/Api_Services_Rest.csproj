@@ -168,7 +168,6 @@
   <ItemGroup>
     <Content Include="Global.asax" />
     <Content Include="Web.config" />
-    <Content Include="connectionStrings.config" />
     <Content Include="connectionStrings.Release.config" />
   </ItemGroup>
   <ItemGroup>
@@ -185,6 +184,9 @@
     </Compile>
     <Compile Include="Mapper\AutoMapperConfig.cs" />
     <Compile Include="Models\Dto\LoginDto.cs" />
+    <Compile Include="Services\Seguridad\JwtService.cs" />
+    <Compile Include="Services\Seguridad\JwtAuthenticationHandler.cs" />
+    <Compile Include="Services\Seguridad\LoginAttemptTracker.cs" />
     <Compile Include="Services\Seguridad\PasswordHasher.cs" />
     <Compile Include="Mapper\MappingProfile.cs" />
     <Compile Include="Models\Dto\DeleteRolResult.cs" />

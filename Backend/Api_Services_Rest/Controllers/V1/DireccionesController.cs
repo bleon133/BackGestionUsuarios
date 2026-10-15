@@ -10,6 +10,7 @@ using System.Web.Http;
 
 namespace Api_Services_Rest.Controllers.V1
 {
+    [Authorize]
     [RoutePrefix("api/v1/Direcciones")]
     public class DireccionesController : ApiController
     {
@@ -60,12 +61,15 @@ namespace Api_Services_Rest.Controllers.V1
             if (dto == null)
                 return BadRequest("El cuerpo de la solicitud no puede ser nulo.");
 
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 var model = AutoMapperConfig.Mapper.Map<Api_Services_Rest.Domain.Models.direcciones>(dto);
                 var result = _direccionServices.CreateDireccion(model);
                 if (!result)
-                    return InternalServerError(new Exception("No se pudo crear la dirección."));
+                    return InternalServerError();
 
                 return Ok(result);
             }
@@ -85,6 +89,9 @@ namespace Api_Services_Rest.Controllers.V1
 
             if (dto == null)
                 return BadRequest("El cuerpo de la solicitud no puede ser nulo.");
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             try
             {

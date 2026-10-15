@@ -10,6 +10,7 @@ using System.Web.Http;
 
 namespace Api_Services_Rest.Controllers.V1
 {
+    [Authorize]
     [RoutePrefix("api/v1/UsuarioRoles")]
     public class UsuarioRolesController : ApiController
     {
@@ -66,11 +67,15 @@ namespace Api_Services_Rest.Controllers.V1
 
         // POST api/v1/UsuarioRoles
         [HttpPost]
+        [Authorize(Roles = "ADMIN")]
         [Route("")]
         public IHttpActionResult Create([FromBody] UsuarioRolesDto dto)
         {
             if (dto == null)
                 return BadRequest("El cuerpo de la solicitud no puede ser nulo.");
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             try
             {
@@ -89,6 +94,7 @@ namespace Api_Services_Rest.Controllers.V1
 
         // DELETE api/v1/UsuarioRoles/{id}
         [HttpDelete]
+        [Authorize(Roles = "ADMIN")]
         [Route("{id:int}")]
         public IHttpActionResult Delete([FromUri] int id)
         {

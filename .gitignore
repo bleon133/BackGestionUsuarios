@@ -419,3 +419,7 @@ FodyWeavers.xsd
 
 # Secretos locales (connection strings)
 **/connectionStrings*.config
+
+# Archivos de configuración con secretos (appSettings externos, JWT, etc.)
+**/appSettings.config
+**/secrets.config

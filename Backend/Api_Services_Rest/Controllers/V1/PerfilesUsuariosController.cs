@@ -10,6 +10,7 @@ using System.Web.Http;
 
 namespace Api_Services_Rest.Controllers.V1
 {
+    [Authorize]
     [RoutePrefix("api/v1/PerfilesUsuarios")]
     public class PerfilesUsuariosController : ApiController
     {
@@ -76,12 +77,15 @@ namespace Api_Services_Rest.Controllers.V1
             if (dto == null)
                 return BadRequest("El cuerpo de la solicitud no puede ser nulo.");
 
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 var model = AutoMapperConfig.Mapper.Map<Api_Services_Rest.Domain.Models.perfilUsuario>(dto);
                 var result = _perfilServices.CreatePerfil(model);
                 if (!result)
-                    return InternalServerError(new Exception("No se pudo crear el perfil."));
+                    return InternalServerError();
 
                 return Ok(result);
             }
@@ -101,6 +105,9 @@ namespace Api_Services_Rest.Controllers.V1
 
             if (dto == null)
                 return BadRequest("El cuerpo de la solicitud no puede ser nulo.");
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             try
             {

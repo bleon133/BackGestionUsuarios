@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copia este archivo como appSettings.config y completa los valores.
+  appSettings.config NO se versiona (como connectionStrings.config).
+  Para usarlo, en Web.config cambia <appSettings> por:
+    <appSettings configSource="appSettings.config" />
+-->
+<appSettings>
+  <!-- Secreto para firmar los JWT (HS256). Cadena larga y aleatoria, mínimo 32 caracteres. -->
+  <add key="Jwt:Secret" value="CAMBIA_ESTO_POR_UN_SECRETO_LARGO_Y_ALEATORIO_DE_32_O_MAS_CARACTERES" />
+  <add key="Jwt:ExpiresMinutes" value="60" />
+  <add key="Jwt:Issuer" value="GestionUsuarios" />
+  <add key="Cors:Origins" value="http://localhost:5173" />
+</appSettings>
